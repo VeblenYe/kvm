@@ -1,9 +1,16 @@
 package com.example.kvm.Controller;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.example.kvm.Models.Host;
 import com.example.kvm.Models.User;
+import com.example.kvm.Models.VMachine;
+import com.example.kvm.Repository.HostRepository;
 import com.example.kvm.Repository.UserRepository;
 import com.example.kvm.Utils.KvmUtils;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
 import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
@@ -14,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,17 +39,17 @@ public class KvmOperationController {
     @Autowired
     private UserRepository userRepository;
 
-    private Map<String, Object> convertDomainInfo(Domain d) throws LibvirtException {
-        Map<String, Object> dm = new HashMap<String, Object>();
-        dm.put("uuid", d.getUUIDString());
-        dm.put("name", d.getName());
-        dm.put("cpus", d.getInfo().nrVirtCpu);
-        dm.put("memory", d.getMaxMemory());
-        dm.put("state", MyDomainState.values()[d.getInfo().state.ordinal()]);
-        return dm;
+    private VMachine convertDomainInfo(Domain d) throws LibvirtException {
+        VMachine vMachine = new VMachine();
+        vMachine.setVm_uuid(d.getUUIDString());
+        vMachine.setVm_name(d.getName());
+        vMachine.setVm_cpus(d.getInfo().nrVirtCpu);
+        vMachine.setVm_memory(d.getMaxMemory());
+        vMachine.setVm_state(MyDomainState.values()[d.getInfo().state.ordinal()].toString());
+        return vMachine;
     }
 
-    private List<Map<String, Object>> getDomainList(Connect conn) {
+    private List<VMachine> getDomainList(Connect conn) {
         List doms = new ArrayList();
         String[] domStates = {"nostate", "running"};
 
@@ -57,8 +65,9 @@ public class KvmOperationController {
         return doms;
     }
 
-    private void getKvmInfo(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO Auto-generated method stub
+    @GetMapping("/getVmInfo")
+    @ResponseBody
+    public String getVmInfo() {
         Connect conn = null;
         try {
             conn = new Connect("qemu:///system", false);
@@ -67,21 +76,13 @@ public class KvmOperationController {
             System.out.println(e.getError());
         }
         try {
-            NodeInfo nodeInfo = conn.nodeInfo();
-            request.setAttribute("model", nodeInfo.model);
-            request.setAttribute("memory", nodeInfo.memory >> 10);
-            request.setAttribute("cpus", nodeInfo.cpus);
-            request.setAttribute("hostname", conn.getHostName());
-            request.setAttribute("type", conn.getType());
-            request.setAttribute("domlist", getDomainList(conn));
-            System.out.println("numOfDefinedDomains:" + conn.numOfDefinedDomains());
-            System.out.println("listDefinedDomains:" + conn.listDefinedDomains());
-            for (String c : conn.listDefinedDomains())
-                System.out.println("    " + c);
-            System.out.println("numOfDomains:" + conn.numOfDomains());
-            System.out.println("listDomainqqqs:" + conn.listDomains());
-            for (int c : conn.listDomains())
-                System.out.println("    -> " + c);
+            List<VMachine> allVms = getDomainList(conn);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("code", 0);
+            jsonObject.put("msg", "");
+            jsonObject.put("count", conn.numOfDefinedDomains());
+            jsonObject.put("data", allVms);
+            return jsonObject.toString();
         } catch (LibvirtException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -93,6 +94,50 @@ public class KvmOperationController {
                 e.printStackTrace();
             }
         }
+        return null;
+    }
+
+    @GetMapping("/getHostInfo")
+    @ResponseBody
+    public String getHostInfo() {
+        // TODO Auto-generated method stub
+        Connect conn = null;
+        try {
+            conn = new Connect("qemu:///system", false);
+        } catch (LibvirtException e) {
+            System.out.println("exception caught:" + e);
+            System.out.println(e.getError());
+        }
+        try {
+            NodeInfo nodeInfo = conn.nodeInfo();
+
+            Host host = new Host();
+            host.setHost_model(nodeInfo.model);
+            host.setHost_memory(nodeInfo.memory >> 10);
+            host.setHost_name(conn.getHostName());
+            host.setHost_type(conn.getType());
+            host.setHost_cpus(nodeInfo.cpus);
+            List<Host> allHosts = new ArrayList<>();
+            allHosts.add(host);
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("code", 0);
+            jsonObject.put("msg", "");
+            jsonObject.put("count", 1);
+            jsonObject.put("data", allHosts);
+            return jsonObject.toString();
+        } catch (LibvirtException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (LibvirtException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
 
@@ -133,40 +178,24 @@ public class KvmOperationController {
         long volSize = Long.parseLong(request.getParameter("disk_size"));
         String sp = request.getParameter("sp");
         KvmUtils.getInstance().createVm(vmName, cpus, mem, volSize, isopath, sp);
-        getKvmInfo(request, response);
-
-        response.setCharacterEncoding("UTF-8");//设置将字符以"UTF-8"编码输出到客户端浏览器
-        //通过设置响应头控制浏览器以UTF-8的编码显示数据，如果不加这句话，那么浏览器显示的将是乱码
-        response.setHeader("content-type", "text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        out.write(request.getAttribute("model").toString());
-        out.write(request.getAttribute("cpus").toString());
-        out.write(request.getAttribute("memory").toString());
     }
 
     @GetMapping("/deleteVm")
-    public String deleteVm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void deleteVm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String vmUuid = request.getParameter("uuid");
         KvmUtils.getInstance().deleteVm(vmUuid, true);
-        getKvmInfo(request, response);
-        return "host";
     }
 
     @GetMapping("/startVm")
-    public String startVm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String vmUuid = request.getParameter("uuid");
-        KvmUtils.getInstance().startVm(vmUuid);
-        getKvmInfo(request, response);
-        return "host";
+    public void startVm(@RequestParam String uuid) {
+        KvmUtils.getInstance().startVm(uuid);
     }
 
     @GetMapping("/shutdownVm")
-    public String shutdownVm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void shutdownVm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // TODO Auto-generated method stub
         String vmUuid = request.getParameter("uuid");
         KvmUtils.getInstance().stopVm(vmUuid);
-        getKvmInfo(request, response);
-        return "host";
     }
 
     @GetMapping("/vmConsole")

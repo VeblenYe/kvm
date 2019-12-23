@@ -16,10 +16,7 @@ public class Host {
 
     @Id
     @GeneratedValue
-    private Integer id;
-
-    @Column
-    private Integer host_id;
+    private Long host_id;
 
     @Column
     private String host_name;
@@ -34,14 +31,20 @@ public class Host {
     private String ipAddr;
 
     @Column
-    private Integer cluster_id;
+    private Long cluster_id;
 
     @Column
     private String host_status;
 
     @Column
-    private String host_cpu;
+    private String host_model;
 
     @Column
-    private Integer host_memory;
+    private Integer host_cpus;
+
+    @Column
+    private Long host_memory;
+
+    @Column
+    private String host_type;
 }

@@ -29,16 +29,6 @@
             </li>
         </ul>
         <ul class="layui-nav layui-layout-right">
-            <li class="layui-nav-item"><a href="javascript:"> aaa 贤心 </a>
-                <dl class="layui-nav-child">
-                    <dd>
-                        <a href="">基本资料</a>
-                    </dd>
-                    <dd>
-                        <a href="">安全设置</a>
-                    </dd>
-                </dl>
-            </li>
             <li class="layui-nav-item"><a href="/logout">退了</a></li>
         </ul>
     </div>
@@ -85,7 +75,8 @@
 
     <div class="layui-body">
         <!-- 内容主体区域 -->
-        <div style="padding: 15px;">内容主体区域</div>
+        <table class="layui-hide" id="host"></table>
+        <table class="layui-hide" id="vm" lay-filter="vm"></table>
     </div>
 
     <div class="layui-footer">
@@ -94,12 +85,11 @@
     </div>
 </div>
 <script th:src="@{/layui/layui.js}"></script>
-<script>
-    //JavaScript代码区域
-    layui.use('element', function () {
-        var element = layui.element;
-
-    });
+<script type="text/html" id="vmTool">
+    <a class="layui-btn layui-btn-xs" lay-event="start">Start</a>
+    <a class="layui-btn layui-btn-xs" lay-event="shutdown">Shutdown</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 </script>
+<script th:src="@{/js/host.js}"></script>
 </body>
 </html>

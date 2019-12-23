@@ -15,10 +15,7 @@ public class Cluster {
 
     @Id
     @GeneratedValue
-    private Integer id;
-
-    @Column
-    private Integer cluster_id;
+    private Long cluster_id;
 
     @Column
     private String cluster_description;
