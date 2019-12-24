@@ -27,7 +27,7 @@ layui.use(['element', 'table', 'layer'], function () {
                 {field: 'vm_name', title: 'name'},
                 {field: 'vm_cpus', title: 'cpus'},
                 {field: 'vm_state', title: 'state'},
-                {fixed: 'right', align:'center', toolbar: '#vmTool'} //这里的toolbar值是模板元素的选择器
+                {fixed: 'right', title: 'operation', align:'center', toolbar: '#vmTool'} //这里的toolbar值是模板元素的选择器
             ]
         ]
         , id: "vmReload"
@@ -87,6 +87,52 @@ layui.use(['element', 'table', 'layer'], function () {
                     }, 'data');
                 }
             })
+        } else if(obj.event === 'console') {
+            $.ajax({
+                url: 'vmConsole',
+                async: false,
+                type: "get",
+                data: {'vm_uuid': data['vm_uuid']},
+                success: function (req) {
+                    layer.open({
+                        type: 2,
+                        title: 'vmConsole',
+                        area: ['390px', '260px'],
+                        content: req,
+                    })
+                }
+            })
         }
+    });
+
+
+    const active = {
+        createVm: function () {
+            const that = this;q
+            layer.open({
+                type: 2
+                , title: 'createVm'
+                , area: ['390px', '260px']
+                , shade: 0
+                , maxmin: true
+                , content: 'createVm'
+                , btn: ['create', 'close']
+                , yes: function () {
+                    $(that).click();
+                }
+                , btn2: function () {
+                    layer.closeAll();
+                }
+                , zIndex: layer.zIndex //重点1
+                , success: function (layero) {
+                    layer.setTop(layero); //重点2
+                }
+            });
+        }
+    };
+
+    $('#contentMain .layui-btn').on('click', function(){
+        const othis = $(this), method = othis.data('method');
+        active[method] ? active[method].call(this, othis) : '';
     });
 });

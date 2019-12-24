@@ -142,7 +142,7 @@ public class KvmOperationController {
 
 
     @GetMapping("/")
-    public String index(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public String host() {
         return "host";
     }
 
@@ -170,7 +170,12 @@ public class KvmOperationController {
     }
 
     @GetMapping("/createVm")
-    public void createVm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public String createVm() {
+        return "createVm";
+    }
+
+    @PostMapping("/do_createVm")
+    public String createVm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String isopath = request.getParameter("isopath");
         String vmName = request.getParameter("name");
         int cpus = Integer.parseInt(request.getParameter("cpu"));
@@ -178,11 +183,14 @@ public class KvmOperationController {
         long volSize = Long.parseLong(request.getParameter("disk_size"));
         String sp = request.getParameter("sp");
         KvmUtils.getInstance().createVm(vmName, cpus, mem, volSize, isopath, sp);
+        return "redirect:/";
     }
 
     @GetMapping("/deleteVm")
-    public void deleteVm(@RequestParam String vm_uuid) {
+    @ResponseBody
+    public String deleteVm(@RequestParam String vm_uuid) {
         KvmUtils.getInstance().deleteVm(vm_uuid, true);
+        return "success";
     }
 
     @GetMapping("/startVm")
@@ -200,14 +208,14 @@ public class KvmOperationController {
     }
 
     @GetMapping("/vmConsole")
-    public void vmConsole(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String vmUuid = request.getParameter("uuid");
+    @ResponseBody
+    public String vmConsole(@RequestParam String vm_uuid, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String vmUuid = vm_uuid;
         KvmUtils.getInstance().setVncProxyFile(vmUuid);
         System.out.println("url=" + request.getRequestURL());
         java.net.URL url = new java.net.URL(request.getRequestURL().toString());
-
         System.out.println("url-host=" + url.getHost());
-        response.sendRedirect("http://" + url.getHost() + ":6080" + "/vnc_lite.html?token=" + vmUuid);
+        return "http://" + url.getHost() + ":6080" + "/vnc_lite.html?token=" + vmUuid;
     }
 
     public enum MyDomainState {

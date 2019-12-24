@@ -73,9 +73,10 @@
         </div>
     </div>
 
-    <div class="layui-body">
+    <div class="layui-body" id="contentMain">
         <!-- 内容主体区域 -->
         <table class="layui-hide" id="host"></table>
+        <button data-method="createVm" class="layui-btn">CreateVm</button>
         <table class="layui-hide" id="vm" lay-filter="vm"></table>
     </div>
 
@@ -88,6 +89,7 @@
 <script type="text/html" id="vmTool">
     <a class="layui-btn layui-btn-xs" lay-event="start">Start</a>
     <a class="layui-btn layui-btn-xs" lay-event="shutdown">Shutdown</a>
+    <a class="layui-btn layui-btn-xs" lay-event="console">Console</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 </script>
 <script th:src="@{/js/host.js}"></script>
