@@ -181,21 +181,22 @@ public class KvmOperationController {
     }
 
     @GetMapping("/deleteVm")
-    public void deleteVm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String vmUuid = request.getParameter("uuid");
-        KvmUtils.getInstance().deleteVm(vmUuid, true);
+    public void deleteVm(@RequestParam String vm_uuid) {
+        KvmUtils.getInstance().deleteVm(vm_uuid, true);
     }
 
     @GetMapping("/startVm")
-    public void startVm(@RequestParam String uuid) {
-        KvmUtils.getInstance().startVm(uuid);
+    @ResponseBody
+    public String startVm(@RequestParam String vm_uuid) {
+        KvmUtils.getInstance().startVm(vm_uuid);
+        return "success";
     }
 
     @GetMapping("/shutdownVm")
-    public void shutdownVm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO Auto-generated method stub
-        String vmUuid = request.getParameter("uuid");
-        KvmUtils.getInstance().stopVm(vmUuid);
+    @ResponseBody
+    public String shutdownVm(@RequestParam String vm_uuid) {
+        KvmUtils.getInstance().stopVm(vm_uuid);
+        return "success";
     }
 
     @GetMapping("/vmConsole")

@@ -1,6 +1,7 @@
-layui.use(['element', 'table'], function () {
-    var table = layui.table;
-    var $ = layui.$;
+layui.use(['element', 'table', 'layer'], function () {
+    const table = layui.table;
+    const layer = layui.layer;
+    const $ = layui.$;
 
     table.render({
         elem: '#host'
@@ -29,19 +30,63 @@ layui.use(['element', 'table'], function () {
                 {fixed: 'right', align:'center', toolbar: '#vmTool'} //这里的toolbar值是模板元素的选择器
             ]
         ]
+        , id: "vmReload"
     });
 
     table.on('tool(vm)', function(obj){
-        var data = obj.data;
+        const data = obj.data;
         if(obj.event === 'start'){
-
+            $.ajax({
+                url: 'startVm',
+                async: false,
+                type: "get",
+                data: {'vm_uuid': data['vm_uuid']},
+                success: function (req) {
+                    //执行重载
+                    table.reload('vmReload', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                        , where: {}
+                    }, 'data');
+                }
+            })
         } else if(obj.event === 'del'){
             layer.confirm('真的删除行么', function(index){
                 obj.del();
                 layer.close(index);
+                $.ajax({
+                    url: 'deleteVm',
+                    async: false,
+                    type: "get",
+                    data: {'vm_uuid': data['vm_uuid']},
+                    success: function (req) {
+                        //执行重载
+                        table.reload('vmReload', {
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            }
+                            , where: {}
+                        }, 'data');
+                    }
+                })
             });
         } else if(obj.event === 'shutdown'){
-            layer.alert('编辑行：<br>'+ JSON.stringify(data))
+            $.ajax({
+                url: 'shutdownVm',
+                async: false,
+                type: "get",
+                data: {'vm_uuid': data['vm_uuid']},
+                success: function (req) {
+                    //执行重载
+                    table.reload('vmReload', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                        , where: {}
+                    }, 'data');
+                }
+            })
         }
     });
 });
