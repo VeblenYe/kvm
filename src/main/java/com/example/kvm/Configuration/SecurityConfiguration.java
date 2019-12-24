@@ -35,6 +35,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .logout()
                 .permitAll();
 
+        http.headers().frameOptions().sameOrigin().httpStrictTransportSecurity().disable();
+
         //解决非thymeleaf的form表单提交被拦截问题
         http.csrf().disable();
 

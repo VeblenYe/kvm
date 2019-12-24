@@ -1,7 +1,8 @@
-layui.use(['element', 'table', 'layer'], function () {
+layui.use(['element', 'table', 'layer', 'form'], function () {
     const table = layui.table;
     const layer = layui.layer;
     const $ = layui.$;
+    const form = layui.form;
 
     table.render({
         elem: '#host'
@@ -27,15 +28,15 @@ layui.use(['element', 'table', 'layer'], function () {
                 {field: 'vm_name', title: 'name'},
                 {field: 'vm_cpus', title: 'cpus'},
                 {field: 'vm_state', title: 'state'},
-                {fixed: 'right', title: 'operation', align:'center', toolbar: '#vmTool'} //这里的toolbar值是模板元素的选择器
+                {fixed: 'right', title: 'operation', align: 'center', toolbar: '#vmTool'} //这里的toolbar值是模板元素的选择器
             ]
         ]
         , id: "vmReload"
     });
 
-    table.on('tool(vm)', function(obj){
+    table.on('tool(vm)', function (obj) {
         const data = obj.data;
-        if(obj.event === 'start'){
+        if (obj.event === 'start') {
             $.ajax({
                 url: 'startVm',
                 async: false,
@@ -51,8 +52,8 @@ layui.use(['element', 'table', 'layer'], function () {
                     }, 'data');
                 }
             })
-        } else if(obj.event === 'del'){
-            layer.confirm('真的删除行么', function(index){
+        } else if (obj.event === 'del') {
+            layer.confirm('真的删除行么', function (index) {
                 obj.del();
                 layer.close(index);
                 $.ajax({
@@ -71,7 +72,7 @@ layui.use(['element', 'table', 'layer'], function () {
                     }
                 })
             });
-        } else if(obj.event === 'shutdown'){
+        } else if (obj.event === 'shutdown') {
             $.ajax({
                 url: 'shutdownVm',
                 async: false,
@@ -87,7 +88,7 @@ layui.use(['element', 'table', 'layer'], function () {
                     }, 'data');
                 }
             })
-        } else if(obj.event === 'console') {
+        } else if (obj.event === 'console') {
             $.ajax({
                 url: 'vmConsole',
                 async: false,
@@ -97,7 +98,7 @@ layui.use(['element', 'table', 'layer'], function () {
                     layer.open({
                         type: 2,
                         title: 'vmConsole',
-                        area: ['390px', '260px'],
+                        area: ['1000px', '900px'],
                         content: req,
                     })
                 }
@@ -108,30 +109,49 @@ layui.use(['element', 'table', 'layer'], function () {
 
     const active = {
         createVm: function () {
-            const that = this;q
             layer.open({
                 type: 2
                 , title: 'createVm'
-                , area: ['390px', '260px']
+                , area: ['800px', '600px']
                 , shade: 0
                 , maxmin: true
                 , content: 'createVm'
                 , btn: ['create', 'close']
-                , yes: function () {
-                    $(that).click();
+                , yes: function (index, layero) {
+                    const body = layer.getChildFrame('body', index); //得到iframe页面层的BODY
+                    const iframeBtn = body.find('#btn');//得到iframe页面层的提交按钮
+                    iframeBtn.click();//模拟iframe页面层的提交按钮点击
+                    layer.closeAll();
+                    layer.msg(
+                        'Wait to create VM',
+                        {
+                            icon: 6,
+                            time: 1000,
+                            shade: 0.3,
+                            end: function () {
+                                table.reload('vmReload', {
+                                    page: {
+                                        curr: 1 //重新从第 1 页开始
+                                    }
+                                    , where: {}
+                                }, 'data');
+                            }
+                        });
+
+
                 }
                 , btn2: function () {
                     layer.closeAll();
                 }
-                , zIndex: layer.zIndex //重点1
                 , success: function (layero) {
-                    layer.setTop(layero); //重点2
+
                 }
             });
         }
+
     };
 
-    $('#contentMain .layui-btn').on('click', function(){
+    $('#contentMain .layui-btn').on('click', function () {
         const othis = $(this), method = othis.data('method');
         active[method] ? active[method].call(this, othis) : '';
     });

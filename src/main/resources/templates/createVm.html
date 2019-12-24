@@ -6,56 +6,66 @@
     <link th:href="@{/layui/css/layui.css}" rel="stylesheet"/>
 </head>
 <body>
-<form class="layui-form" action="@{/do_createVm}">
+<form class="layui-form" method="post" id="VmForm" action="do_createVm">
     <div class="layui-form-item">
-        <label class="layui-form-label">单行输入框</label>
+        <label class="layui-form-label">VmName</label>
         <div class="layui-input-block">
-            <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+            <input type="text" name="VmName" lay-verify="title" autocomplete="off" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">验证必填项</label>
+        <label class="layui-form-label">VmDescription</label>
         <div class="layui-input-block">
-            <input type="text" name="username" lay-verify="required" lay-reqtext="用户名是必填项，岂能为空？" placeholder="请输入" autocomplete="off" class="layui-input">
+            <input type="text" name="VmDescription" lay-verify="title" autocomplete="off" class="layui-input">
         </div>
     </div>
-
     <div class="layui-form-item">
-        <div class="layui-inline">
-            <label class="layui-form-label">验证手机</label>
-            <div class="layui-input-inline">
-                <input type="tel" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-inline">
-            <label class="layui-form-label">验证邮箱</label>
-            <div class="layui-input-inline">
-                <input type="text" name="email" lay-verify="email" autocomplete="off" class="layui-input">
-            </div>
+        <label class="layui-form-label">Cluster</label>
+        <div class="layui-input-block">
+            <input type="text" name="Cluster" lay-verify="title" autocomplete="off" class="layui-input">
         </div>
     </div>
-
     <div class="layui-form-item">
-        <div class="layui-inline">
-            <label class="layui-form-label">多规则验证</label>
-            <div class="layui-input-inline">
-                <input type="text" name="number" lay-verify="required|number" autocomplete="off" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-inline">
-            <label class="layui-form-label">验证日期</label>
-            <div class="layui-input-inline">
-                <input type="text" name="date" id="date" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-inline">
-            <label class="layui-form-label">验证链接</label>
-            <div class="layui-input-inline">
-                <input type="tel" name="url" lay-verify="url" autocomplete="off" class="layui-input">
-            </div>
+        <label class="layui-form-label">Host</label>
+        <div class="layui-input-block">
+            <input type="text" name="Host" lay-verify="title" autocomplete="off" class="layui-input">
         </div>
     </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">VmMemory(MB)</label>
+        <div class="layui-input-block">
+            <input type="text" name="VmMemory" lay-verify="title" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">VmDisk(GB)</label>
+        <div class="layui-input-block">
+            <input type="text" name="VmDisk" lay-verify="title" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">VmAddr</label>
+        <div class="layui-input-block">
+            <select id="vmAddr" name="VmAddr" lay-verify="required">
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">VmCPUs</label>
+        <div class="layui-input-block">
+            <input type="text" name="VmCPUs" lay-verify="title" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">ISO</label>
+        <div class="layui-input-block">
+            <select id="iso" name="iso" lay-verify="required">
+            </select>
+        </div>
+    </div>
+    <button style="display: none" id="btn" class="btn btn-lg btn-primary btn-block" type="submit"></button>
 </form>
 <script th:src="@{/layui/layui.js}"></script>
+<script th:src="@{/js/createVm.js}"></script>
 </body>
 </html>

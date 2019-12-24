@@ -28,10 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class KvmOperationController {
@@ -169,6 +166,19 @@ public class KvmOperationController {
         return "redirect:login";
     }
 
+    @GetMapping("/getStoragePools")
+    @ResponseBody
+    public List<String> getStoragePools() {
+        List<String> result = Arrays.asList(KvmUtils.getInstance().listStoragePools());
+        return result;
+    }
+
+    @GetMapping("/getIsoVolumes")
+    @ResponseBody
+    public Map getIsoVolumes() {
+        return KvmUtils.getInstance().listIsoVolumes();
+    }
+
     @GetMapping("/createVm")
     public String createVm() {
         return "createVm";
@@ -176,12 +186,12 @@ public class KvmOperationController {
 
     @PostMapping("/do_createVm")
     public String createVm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String isopath = request.getParameter("isopath");
-        String vmName = request.getParameter("name");
-        int cpus = Integer.parseInt(request.getParameter("cpu"));
-        long mem = Long.parseLong(request.getParameter("mem"));
-        long volSize = Long.parseLong(request.getParameter("disk_size"));
-        String sp = request.getParameter("sp");
+        String isopath = request.getParameter("iso");
+        String vmName = request.getParameter("VmName");
+        int cpus = Integer.parseInt(request.getParameter("VmCPUs"));
+        long mem = Long.parseLong(request.getParameter("VmMemory"));
+        long volSize = Long.parseLong(request.getParameter("VmDisk"));
+        String sp = request.getParameter("VmAddr");
         KvmUtils.getInstance().createVm(vmName, cpus, mem, volSize, isopath, sp);
         return "redirect:/";
     }
