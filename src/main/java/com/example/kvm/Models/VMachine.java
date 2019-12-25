@@ -33,6 +33,9 @@ public class VMachine {
     private Long hostId;
 
     @Column
+    private Long clusterId;
+
+    @Column
     private Integer vmCpus;
 
     @Column

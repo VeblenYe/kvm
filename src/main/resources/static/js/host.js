@@ -4,12 +4,20 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
     const $ = layui.$;
     const tree = layui.tree;
 
-    //无连接线风格
-    // tree.render({
-    //     elem: '#tree'
-    //     ,data: data1
-    //     ,showLine: false  //是否开启连接线
-    // });
+    $.ajax({
+        url: "getTreeData",
+        type: "get",
+        async: false,
+        success: function (req) {
+            tree.render({
+                elem: '#tree',
+                id: 'treeId'
+                ,data: req
+                ,showLine: false  //是否开启连接线
+            });
+        }
+    })
+
 
     table.render({
         elem: '#host'
@@ -95,6 +103,8 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                     }, 'data');
                 }
             })
+            tree.reload('treeId', {
+            })
         } else if (obj.event === 'console') {
             $.ajax({
                 url: 'vmConsole',
@@ -111,6 +121,16 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                 }
             })
         }
+        $.ajax({
+            url: "getTreeData",
+            type: "get",
+            async: false,
+            success: function (req) {
+                tree.reload('treeId', {
+                    data: req
+                });
+            }
+        })
     });
 
     const active = {
@@ -133,7 +153,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                         {
                             icon: 6,
                             time: 1000,
-                            shade: 1,
+                            shade: 0.5,
                             end: function () {
                                 table.reload('vmReload', {
                                     page: {

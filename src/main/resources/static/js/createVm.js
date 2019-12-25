@@ -1,5 +1,5 @@
 layui.use(['form'], function () {
-    const form = layui.form;
+    var form = layui.form;
     const $ = layui.$;
 
     $.ajax({
@@ -36,7 +36,7 @@ layui.use(['form'], function () {
         async: false,
         success: function (data) {
             const obj = JSON.parse(data);
-            const maxMem = parseInt(obj['data'][0]['host_memory']);
+            const maxMem = parseInt(obj['data'][0]['hostMemory']);
             var memory = 1024;
             var id = 0;
             do {
@@ -45,7 +45,7 @@ layui.use(['form'], function () {
                 ++id;
             } while (memory < maxMem);
 
-            const maxCPUs = parseInt(obj['data'][0]['host_cpus']);
+            const maxCPUs = parseInt(obj['data'][0]['hostCpus']);
             var cpu = 1;
             id = 0;
             do {
@@ -56,5 +56,54 @@ layui.use(['form'], function () {
             layui.form.render("select");
         }
     })
+
+    $.ajax({
+        url: 'getClusterList',
+        type: 'get',
+        async: false,
+        success: function (data) {
+            //console.log(data);
+            $.each(data, function (index, item) {
+                //console.log(item);
+                $('#cluster').append(new Option(item['clusterId'], item.id));// 下拉菜单里添加元素
+            });
+            $.ajax({
+                url: 'getHostList',
+                type: 'get',
+                data: {'clusterId': "1"},
+                async: false,
+                success: function (data) {
+                    //console.log(data);
+                    $('#host').empty();
+                    $.each(data, function (index, item) {
+                        //console.log(item);
+                        $('#host').append(new Option(item['hostId'], item.id));// 下拉菜单里添加元素
+                    });
+                    layui.form.render("select");
+                }
+            })
+            layui.form.render("select");
+        }
+    })
+
+    form.on('select(cluster)', function(data) {
+        //event.preventDefault();
+        console.log(data.value);
+        $.ajax({
+            url: 'getHostList',
+            type: 'get',
+            data: {'clusterId': data.value},
+            async: false,
+            success: function (data) {
+                //console.log(data);
+                $('#host').empty();
+                $.each(data, function (index, item) {
+                    //console.log(item);
+                    $('#host').append(new Option(item['hostId'], item.id));// 下拉菜单里添加元素
+                });
+                layui.form.render("select");
+            }
+        })
+    });
 
 });

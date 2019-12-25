@@ -2,7 +2,6 @@ package com.example.kvm.Controller;
 
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.kvm.Models.Cluster;
 import com.example.kvm.Models.Host;
@@ -13,12 +12,13 @@ import com.example.kvm.Repository.HostRepository;
 import com.example.kvm.Repository.UserRepository;
 import com.example.kvm.Repository.VMachineRepository;
 import com.example.kvm.Utils.KvmUtils;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
+import com.example.kvm.Utils.TreeDataUtils;
 import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
 import org.libvirt.NodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.query.PartTreeJpaQuery;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +30,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class KvmOperationController {
@@ -152,23 +154,40 @@ public class KvmOperationController {
 
     @GetMapping("/getTreeData")
     @ResponseBody
-    public String getTreeData() {
-        JSONObject jsonObject = new JSONObject();
+    public List<TreeDataUtils> getTreeData()     {
         List<Cluster> clusterList = clusterRepository.findAll();
         List<Host> hostList = hostRepository.findAll();
         List<VMachine> vMachineList = vMachineRepository.findAll();
+
+        List<TreeDataUtils> treeDataUtilsList = new ArrayList<>();
         for (Cluster cluster : clusterList) {
+            TreeDataUtils CTreeData = new TreeDataUtils();
+            CTreeData.setTitle("Cluster" + cluster.getClusterId());
+            CTreeData.setSpread(true);
+            treeDataUtilsList.add(CTreeData);
             for (Host host : hostList) {
                 if (host.getClusterId() == cluster.getClusterId()) {
+                    TreeDataUtils HTreeData = new TreeDataUtils();
+                    HTreeData.setSpread(true);
+                    HTreeData.setTitle("Host" + host.getHostId());
+                    CTreeData.getChildren().add(HTreeData);
                     for (VMachine vMachine : vMachineList) {
                         if (vMachine.getHostId() == host.getHostId()) {
-
+                            TreeDataUtils VTreeData = new TreeDataUtils();
+                            VTreeData.setTitle(vMachine.getVmName());
+                            VTreeData.setSpread(true);
+                            if (vMachine.getVmState().equalsIgnoreCase("shutoff")) {
+                                CTreeData.getChildren().add(VTreeData);
+                            } else if (vMachine.getVmState().equalsIgnoreCase("running")) {
+                                HTreeData.getChildren().add(VTreeData);
+                            }
                         }
                     }
                 }
             }
         }
-        return "";
+
+        return treeDataUtilsList;
     }
 
 
@@ -213,34 +232,70 @@ public class KvmOperationController {
         return KvmUtils.getInstance().listIsoVolumes();
     }
 
+    @GetMapping("/getClusterList")
+    @ResponseBody
+    public List<Cluster> getClusterList() {
+        return clusterRepository.findAll();
+    }
+
+    @GetMapping("/getHostList")
+    @ResponseBody
+    public List<Host> getHostList(@RequestParam String clusterId) {
+        if (clusterId == null || clusterId.isEmpty()) {
+            return hostRepository.findAll();
+        } else {
+            return hostRepository.findByClusterId(Long.parseLong(clusterId));
+        }
+    }
+
     @GetMapping("/createVm")
     public String createVm() {
         return "createVm";
     }
 
     @PostMapping("/do_createVm")
-    public String createVm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public String do_createVm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String isopath = request.getParameter("iso");
         String vmName = request.getParameter("VmName");
         int cpus = Integer.parseInt(request.getParameter("VmCPUs"));
         long mem = Long.parseLong(request.getParameter("VmMemory"));
         long volSize = Long.parseLong(request.getParameter("VmDisk"));
         String sp = request.getParameter("VmAddr");
-        KvmUtils.getInstance().createVm(vmName, cpus, mem, volSize, isopath, sp);
+        String uuid = KvmUtils.getInstance().createVm(vmName, cpus, mem, volSize, isopath, sp);
+
+        VMachine vMachine = new VMachine();
+        vMachine.setVmState("shutoff");
+        vMachine.setVmMemory(mem);
+        vMachine.setVmName(vmName);
+        vMachine.setVmCpus(cpus);
+        vMachine.setVmUuid(uuid);
+        vMachine.setHostId(Long.parseLong(request.getParameter("Host")));
+        vMachine.setClusterId(Long.parseLong(request.getParameter("Cluster")));
+        vMachineRepository.save(vMachine);
+
         return "redirect:/";
     }
 
     @GetMapping("/deleteVm")
     @ResponseBody
     public String deleteVm(@RequestParam String vm_uuid) {
-        KvmUtils.getInstance().deleteVm(vm_uuid, true);
-        return "success";
+        VMachine vMachine = vMachineRepository.findByVmUuid(vm_uuid);
+        if (vMachine.getVmState().equalsIgnoreCase("shutoff")) {
+            KvmUtils.getInstance().deleteVm(vm_uuid, true);
+            vMachineRepository.delete(vMachine);
+            return "success";
+        } else {
+            return "failed";
+        }
     }
 
     @GetMapping("/startVm")
     @ResponseBody
     public String startVm(@RequestParam String vm_uuid) {
         KvmUtils.getInstance().startVm(vm_uuid);
+        VMachine vMachine = vMachineRepository.findByVmUuid(vm_uuid);
+        vMachine.setVmState("running");
+        vMachineRepository.save(vMachine);
         return "success";
     }
 
@@ -248,6 +303,9 @@ public class KvmOperationController {
     @ResponseBody
     public String shutdownVm(@RequestParam String vm_uuid) {
         KvmUtils.getInstance().stopVm(vm_uuid);
+        VMachine vMachine = vMachineRepository.findByVmUuid(vm_uuid);
+        vMachine.setVmState("shutoff");
+        vMachineRepository.save(vMachine);
         return "success";
     }
 

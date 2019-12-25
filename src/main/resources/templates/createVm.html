@@ -22,13 +22,15 @@
     <div class="layui-form-item">
         <label class="layui-form-label">Cluster</label>
         <div class="layui-input-block">
-            <input type="text" name="Cluster" lay-verify="title" autocomplete="off" class="layui-input">
+            <select id="cluster" name="Cluster" lay-filter="cluster" lay-verify="required">
+            </select>
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">Host</label>
         <div class="layui-input-block">
-            <input type="text" name="Host" lay-verify="title" autocomplete="off" class="layui-input">
+            <select id="host" name="Host" lay-verify="required">
+            </select>
         </div>
     </div>
     <div class="layui-form-item">

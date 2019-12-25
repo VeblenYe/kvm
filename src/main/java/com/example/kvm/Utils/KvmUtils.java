@@ -241,16 +241,16 @@ public class KvmUtils {
         return -1;
     }
 
-    public int createVm(String name, int cpu, long mem, long diskSize, String isopath, String sp) {
+    public String createVm(String name, int cpu, long mem, long diskSize, String isopath, String sp) {
         String volPath = createDisk(sp, name + "_disk", diskSize);
         try {
-            conn.domainDefineXML(String.format(xmldesc, name, mem, mem, cpu, volPath, isopath));
-            return 0;
+            Domain domain = conn.domainDefineXML(String.format(xmldesc, name, mem, mem, cpu, volPath, isopath));
+            return domain.getUUIDString();
         } catch (LibvirtException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return -1;
+        return "failedss";
     }
 
     public String createDisk(String sp, String name, long size) {

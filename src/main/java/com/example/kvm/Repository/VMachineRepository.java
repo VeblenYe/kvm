@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface VMachineRepository extends JpaRepository<VMachine, Integer> {
     List<VMachine> findByHostId(Long host_id);
+
+    VMachine findByVmUuid(String vmUuid);
 }

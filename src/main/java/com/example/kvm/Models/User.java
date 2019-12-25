@@ -18,7 +18,6 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
-@Transactional(readOnly=true)
 public class User implements UserDetails {
 
     @Id
