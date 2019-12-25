@@ -5,22 +5,22 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
     const tree = layui.tree;
 
     //无连接线风格
-    tree.render({
-        elem: '#tree'
-        ,data: data1
-        ,showLine: false  //是否开启连接线
-    });
+    // tree.render({
+    //     elem: '#tree'
+    //     ,data: data1
+    //     ,showLine: false  //是否开启连接线
+    // });
 
     table.render({
         elem: '#host'
         , url: 'getHostInfo'
         , cols: [
             [
-                {field: 'host_model', title: 'model'},
-                {field: 'host_memory', title: 'memory(MB)'},
-                {field: 'host_name', title: 'hostname'},
-                {field: 'host_cpus', title: 'cpus'},
-                {field: 'host_type', title: 'type'}
+                {field: 'hostModel', title: 'model'},
+                {field: 'hostMemory', title: 'memory(MB)'},
+                {field: 'hostName', title: 'hostname'},
+                {field: 'hostCpus', title: 'cpus'},
+                {field: 'hostType', title: 'type'}
             ]
         ]
     });
@@ -30,11 +30,11 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
         , url: 'getVmInfo'
         , cols: [
             [
-                {field: 'vm_uuid', title: 'uuid'},
-                {field: 'vm_memory', title: 'memory(MB)'},
-                {field: 'vm_name', title: 'name'},
-                {field: 'vm_cpus', title: 'cpus'},
-                {field: 'vm_state', title: 'state'},
+                {field: 'vmUuid', title: 'uuid'},
+                {field: 'vmMemory', title: 'memory(MB)'},
+                {field: 'vmName', title: 'name'},
+                {field: 'vmCpus', title: 'cpus'},
+                {field: 'vmState', title: 'state'},
                 {fixed: 'right', title: 'operation', align: 'center', toolbar: '#vmTool'} //这里的toolbar值是模板元素的选择器
             ]
         ]
@@ -48,7 +48,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                 url: 'startVm',
                 async: false,
                 type: "get",
-                data: {'vm_uuid': data['vm_uuid']},
+                data: {'vm_uuid': data['vmUuid']},
                 success: function (req) {
                     //执行重载
                     table.reload('vmReload', {
@@ -67,7 +67,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                     url: 'deleteVm',
                     async: false,
                     type: "get",
-                    data: {'vm_uuid': data['vm_uuid']},
+                    data: {'vm_uuid': data['vmUuid']},
                     success: function (req) {
                         //执行重载
                         table.reload('vmReload', {
@@ -84,7 +84,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                 url: 'shutdownVm',
                 async: false,
                 type: "get",
-                data: {'vm_uuid': data['vm_uuid']},
+                data: {'vm_uuid': data['vmUuid']},
                 success: function (req) {
                     //执行重载
                     table.reload('vmReload', {
@@ -100,7 +100,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                 url: 'vmConsole',
                 async: false,
                 type: "get",
-                data: {'vm_uuid': data['vm_uuid']},
+                data: {'vm_uuid': data['vmUuid']},
                 success: function (req) {
                     layer.open({
                         type: 2,
