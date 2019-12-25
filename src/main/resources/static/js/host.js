@@ -112,7 +112,7 @@ layui.use(['element', 'table', 'layer', 'form'], function () {
             layer.open({
                 type: 2
                 , title: 'createVm'
-                , area: ['800px', '600px']
+                , area: ['900px', '600px']
                 , shade: 0
                 , maxmin: true
                 , content: 'createVm'
@@ -127,7 +127,7 @@ layui.use(['element', 'table', 'layer', 'form'], function () {
                         {
                             icon: 6,
                             time: 1000,
-                            shade: 0.3,
+                            shade: 1,
                             end: function () {
                                 table.reload('vmReload', {
                                     page: {

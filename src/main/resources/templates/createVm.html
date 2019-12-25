@@ -10,7 +10,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label">VmName</label>
         <div class="layui-input-block">
-            <input type="text" name="VmName" lay-verify="title" autocomplete="off" class="layui-input">
+            <input type="text" name="VmName" lay-verify="title" autocomplete="off" class="layui-input" required>
         </div>
     </div>
     <div class="layui-form-item">
@@ -32,9 +32,10 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">VmMemory(MB)</label>
+        <label class="layui-form-label">VmMem(MB)</label>
         <div class="layui-input-block">
-            <input type="text" name="VmMemory" lay-verify="title" autocomplete="off" class="layui-input">
+            <select id="vmMemory" name="VmMemory" lay-verify="required">
+            </select>
         </div>
     </div>
     <div class="layui-form-item">
@@ -53,7 +54,8 @@
     <div class="layui-form-item">
         <label class="layui-form-label">VmCPUs</label>
         <div class="layui-input-block">
-            <input type="text" name="VmCPUs" lay-verify="title" autocomplete="off" class="layui-input">
+            <select id="vmCPUs" name="VmCPUs" lay-verify="required">
+            </select>
         </div>
     </div>
     <div class="layui-form-item">
