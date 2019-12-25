@@ -1,8 +1,15 @@
-layui.use(['element', 'table', 'layer', 'form'], function () {
+layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
     const table = layui.table;
     const layer = layui.layer;
     const $ = layui.$;
-    const form = layui.form;
+    const tree = layui.tree;
+
+    //无连接线风格
+    tree.render({
+        elem: '#tree'
+        ,data: data1
+        ,showLine: false  //是否开启连接线
+    });
 
     table.render({
         elem: '#host'
@@ -105,7 +112,6 @@ layui.use(['element', 'table', 'layer', 'form'], function () {
             })
         }
     });
-
 
     const active = {
         createVm: function () {

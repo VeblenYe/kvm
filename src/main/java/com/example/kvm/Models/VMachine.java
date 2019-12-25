@@ -15,28 +15,28 @@ public class VMachine {
 
     @Id
     @GeneratedValue
-    private Long vm_id;
+    private Long vmId;
 
     @Column
-    private String vm_name;
+    private String vmName;
 
     @Column
-    private String vm_uuid;
+    private String vmUuid;
 
     @Column
-    private String vm_state;
+    private String vmState;
 
     @Column
-    private String vm_description;
+    private String vmDescription;
 
     @Column
-    private Long host_id;
+    private Long hostId;
 
     @Column
-    private Integer vm_cpus;
+    private Integer vmCpus;
 
     @Column
-    private Long vm_memory;
+    private Long vmMemory;
 
     @Column
     private String os;

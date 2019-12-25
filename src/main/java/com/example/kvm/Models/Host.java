@@ -16,35 +16,35 @@ public class Host {
 
     @Id
     @GeneratedValue
-    private Long host_id;
+    private Long hostId;
 
     @Column
-    private String host_name;
+    private String hostName;
 
     @Column
-    private String host_password;
+    private String hostPassword;
 
     @Column
-    private String host_description;
+    private String hostDescription;
 
     @Column
     private String ipAddr;
 
     @Column
-    private Long cluster_id;
+    private Long clusterId;
 
     @Column
-    private String host_status;
+    private String hostStatus;
 
     @Column
-    private String host_model;
+    private String hostModel;
 
     @Column
-    private Integer host_cpus;
+    private Integer hostCpus;
 
     @Column
-    private Long host_memory;
+    private Long hostMemory;
 
     @Column
-    private String host_type;
+    private String hostType;
 }

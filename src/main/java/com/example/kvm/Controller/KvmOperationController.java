@@ -4,11 +4,14 @@ package com.example.kvm.Controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.example.kvm.Models.Cluster;
 import com.example.kvm.Models.Host;
 import com.example.kvm.Models.User;
 import com.example.kvm.Models.VMachine;
+import com.example.kvm.Repository.ClusterRepository;
 import com.example.kvm.Repository.HostRepository;
 import com.example.kvm.Repository.UserRepository;
+import com.example.kvm.Repository.VMachineRepository;
 import com.example.kvm.Utils.KvmUtils;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
 import org.libvirt.Connect;
@@ -34,15 +37,24 @@ import java.util.*;
 public class KvmOperationController {
 
     @Autowired
+    private ClusterRepository clusterRepository;
+
+    @Autowired
+    private HostRepository hostRepository;
+
+    @Autowired
+    private VMachineRepository vMachineRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     private VMachine convertDomainInfo(Domain d) throws LibvirtException {
         VMachine vMachine = new VMachine();
-        vMachine.setVm_uuid(d.getUUIDString());
-        vMachine.setVm_name(d.getName());
-        vMachine.setVm_cpus(d.getInfo().nrVirtCpu);
-        vMachine.setVm_memory(d.getMaxMemory());
-        vMachine.setVm_state(MyDomainState.values()[d.getInfo().state.ordinal()].toString());
+        vMachine.setVmUuid(d.getUUIDString());
+        vMachine.setVmName(d.getName());
+        vMachine.setVmCpus(d.getInfo().nrVirtCpu);
+        vMachine.setVmMemory(d.getMaxMemory());
+        vMachine.setVmState(MyDomainState.values()[d.getInfo().state.ordinal()].toString());
         return vMachine;
     }
 
@@ -109,11 +121,11 @@ public class KvmOperationController {
             NodeInfo nodeInfo = conn.nodeInfo();
 
             Host host = new Host();
-            host.setHost_model(nodeInfo.model);
-            host.setHost_memory(nodeInfo.memory >> 10);
-            host.setHost_name(conn.getHostName());
-            host.setHost_type(conn.getType());
-            host.setHost_cpus(nodeInfo.cpus);
+            host.setHostModel(nodeInfo.model);
+            host.setHostMemory(nodeInfo.memory >> 10);
+            host.setHostName(conn.getHostName());
+            host.setHostType(conn.getType());
+            host.setHostCpus(nodeInfo.cpus);
             List<Host> allHosts = new ArrayList<>();
             allHosts.add(host);
 
@@ -135,6 +147,28 @@ public class KvmOperationController {
             }
         }
         return null;
+    }
+
+
+    @GetMapping("/getTreeData")
+    @ResponseBody
+    public String getTreeData() {
+        JSONObject jsonObject = new JSONObject();
+        List<Cluster> clusterList = clusterRepository.findAll();
+        List<Host> hostList = hostRepository.findAll();
+        List<VMachine> vMachineList = vMachineRepository.findAll();
+        for (Cluster cluster : clusterList) {
+            for (Host host : hostList) {
+                if (host.getClusterId() == cluster.getClusterId()) {
+                    for (VMachine vMachine : vMachineList) {
+                        if (vMachine.getHostId() == host.getHostId()) {
+
+                        }
+                    }
+                }
+            }
+        }
+        return "";
     }
 
 

@@ -21,7 +21,7 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue
-    private Long user_id;
+    private Long userId;
 
     @Column
     private String username;

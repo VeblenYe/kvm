@@ -15,8 +15,8 @@ public class Cluster {
 
     @Id
     @GeneratedValue
-    private Long cluster_id;
+    private Long clusterId;
 
     @Column
-    private String cluster_description;
+    private String clusterDescription;
 }
