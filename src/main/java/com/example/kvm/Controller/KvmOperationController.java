@@ -371,13 +371,10 @@ public class KvmOperationController {
 
     @GetMapping("/vmConsole")
     @ResponseBody
-    public String vmConsole(@RequestParam String vm_uuid, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String vmUuid = vm_uuid;
-        KvmUtils.getInstance().setVncProxyFile(vmUuid);
-        System.out.println("url=" + request.getRequestURL());
-        URL url = new java.net.URL(request.getRequestURL().toString());
-        System.out.println("url-host=" + url.getHost());
-        return "http://" + url.getHost() + ":6080" + "/vnc_lite.html?token=" + vmUuid;
+    public String vmConsole(@RequestParam String vm_uuid) {
+        Host host = hostRepository.findByHostId(vMachineRepository.findByVmUuid(vm_uuid).getHostId());
+        KvmUtils.getInstance().setVncProxyFile(vm_uuid);
+        return "http://" + host.getVncIP() + ":6080" + "/vnc_lite.html?token=" + vm_uuid;
     }
 
     @GetMapping("/link")
