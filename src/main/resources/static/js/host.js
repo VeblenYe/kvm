@@ -183,7 +183,15 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
     table.on('tool(hostUnlink)', function (obj) {
         const data = obj.data;
         if (obj.event === 'link') {
-            console.log('linking');
+            console.log(data['hostIP']);
+            $.ajax({
+                url: 'link',
+                aysnc: false,
+                data: {'hostIP': data['hostIP']},
+                success: function (req) {
+
+                }
+            })
         }
     });
 

@@ -368,6 +368,12 @@ public class KvmOperationController {
         return "http://" + url.getHost() + ":6080" + "/vnc_lite.html?token=" + vmUuid;
     }
 
+    @GetMapping("/link")
+    public String link(@RequestParam String hostIP) {
+        KvmUtils.setConnURI(hostIP);
+        return "host";
+    }
+
     public enum MyDomainState {
         nostate, running, blocked, paused, shutdown, shutoff, crashed, pmsuspended
     }
