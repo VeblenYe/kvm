@@ -69,7 +69,7 @@ public class KvmUtils {
             "        </permissions>\n" +
             "    </target>\n" +
             "</volume>";
-    private Connect conn = null;
+    private static Connect conn = null;
 
     private static String connURI = "qemu:///system";
 
@@ -93,7 +93,19 @@ public class KvmUtils {
     }
 
     public static void setConnURI(String newConnURI) {
+        try {
+            conn.close();
+        } catch (LibvirtException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         connURI = newConnURI;
+        try {
+            conn = new Connect(connURI, false);
+        } catch (LibvirtException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public int startVm(String vmUuid) {
