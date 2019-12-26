@@ -3,7 +3,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
     const layer = layui.layer;
     const $ = layui.$;
     const tree = layui.tree;
-    var element = layui.element;
+    const element = layui.element;
 
     $.ajax({
         url: "getTreeData",
@@ -13,8 +13,8 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
             tree.render({
                 elem: '#tree',
                 id: 'treeId'
-                ,data: req
-                ,showLine: false  //是否开启连接线
+                , data: req
+                , showLine: false  //是否开启连接线
                 , click: function (obj) {
                     console.log(obj.data); //得到当前点击的节点数据
                     console.log(obj.state); //得到当前节点的展开状态：open、close、normal
@@ -24,7 +24,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                 }
             });
         }
-    })
+    });
 
 
     table.render({
@@ -80,7 +80,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
         , cols: [
             [
                 {field: 'vmName', title: 'vmName'},
-                {field: 'vmUuid', title: 'uuid'},
+                {field: 'vmUuid', title: 'uuid', hide: true},
                 {field: 'vmMemory', title: 'memory(MB)'},
                 {field: 'vmCpus', title: 'cpus'},
                 {field: 'vmState', title: 'state'}
@@ -96,12 +96,22 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                 {field: 'vmName', title: 'name'},
                 {field: 'vmUuid', title: 'uuid', hide: true},
                 {field: 'vmMemory', title: 'memory(MB)'},
+                {
+                    field: 'vmMemLoad', title: 'memLoad(MB)', templet: function (data) {
+                        return '<div class="layui-progress layui-progress-big" lay-showpercent="true">' +
+                            '<div class="layui-progress-bar layui-bg-green" lay-percent="' +
+                            data['vmMemLoad'] + '"></div></div>'
+                    }
+                },
                 {field: 'vmCpus', title: 'cpus'},
                 {field: 'vmState', title: 'state'},
                 {fixed: 'right', title: 'operation', align: 'center', toolbar: '#vmTool'} //这里的toolbar值是模板元素的选择器
             ]
         ]
         , id: "vmReload"
+        , done: function (res, currentCount) {
+            element.render();
+        }
     });
 
     table.on('tool(vm)', function (obj) {
@@ -148,7 +158,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                             }
                         })
                     }
-                })
+                });
                 obj.del();
                 layer.close(index);
             });
@@ -180,25 +190,6 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                         title: 'vmConsole',
                         area: ['1000px', '900px'],
                         content: req,
-                    })
-                }
-            })
-        } else if (obj.event === 'memoryStat') {
-
-            layer.open({
-                type: 2,
-                title: 'MemoryStat',
-                area: ['1000px', '900px'],
-                content: 'memoryStat',
-                success: function(req) {
-                    $.ajax({
-                        url: 'getMemoryStat',
-                        async: false,
-                        type: 'get',
-                        data: {'vm_uuid': data['vmUuid']},
-                        success: function(req) {
-                            element.progress('memoryStatBar', req['MemoryPercent'])
-                        }
                     })
                 }
             })

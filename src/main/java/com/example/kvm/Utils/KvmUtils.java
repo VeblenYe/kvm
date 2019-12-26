@@ -70,19 +70,21 @@ public class KvmUtils {
             "        </permissions>\n" +
             "    </target>\n" +
             "</volume>";
-    private static Connect conn = null;
 
     private static String connURI = "qemu:///system";
 
-    private KvmUtils() {
-        System.out.println("------------->KvmDemoUtils");
+    private static Connect conn;
+
+    static {
         try {
             conn = new Connect(connURI, false);
         } catch (LibvirtException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
-            throw new RuntimeException();
         }
+    }
+
+    private KvmUtils() {
+        System.out.println("------------->KvmDemoUtils");
     }
 
     public static KvmUtils getInstance() {
@@ -290,17 +292,14 @@ public class KvmUtils {
         return null;
     }
 
-    public Map<String, Object> getMemoryStat(String uuid) {
+    public String getMemoryStat(String uuid) {
         Domain domain;
-        Map<String, Object> map = new HashMap<>();
         try {
             domain = conn.domainLookupByUUIDString(uuid);
             MemoryStatistic[] statistics = domain.memoryStats(2);
             DecimalFormat decimalFormat = new DecimalFormat("0");
             double memoryPercent = (double)statistics[1].getValue() / statistics[0].getValue() * 100;
-            String percent = decimalFormat.format(memoryPercent) + "%";
-            map.put("MemoryPercent", percent);
-            return map;
+            return decimalFormat.format(memoryPercent) + "%";
         } catch (LibvirtException e) {
             e.printStackTrace();
         }

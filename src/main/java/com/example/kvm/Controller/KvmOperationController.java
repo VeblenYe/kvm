@@ -55,6 +55,7 @@ public class KvmOperationController {
         vMachine.setVmName(d.getName());
         vMachine.setVmCpus(d.getInfo().nrVirtCpu);
         vMachine.setVmMemory(d.getMaxMemory());
+        vMachine.setVmMemLoad(KvmUtils.getInstance().getMemoryStat(d.getUUIDString()));
         vMachine.setVmState(MyDomainState.values()[d.getInfo().state.ordinal()].toString());
         return vMachine;
     }
@@ -383,16 +384,6 @@ public class KvmOperationController {
         return "host";
     }
 
-    @GetMapping("/getMemoryStat")
-    @ResponseBody
-    public Map<String,Object> getMemoryStat(@RequestParam String vm_uuid) throws ServletException, IOException {
-        return KvmUtils.getInstance().getMemoryUsage(vm_uuid);
-    }
-
-    @GetMapping("/memoryStat")
-    public String memoryStat() {
-        return "memoryStat";
-    }
     public enum MyDomainState {
         nostate, running, blocked, paused, shutdown, shutoff, crashed, pmsuspended
     }

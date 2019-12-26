@@ -21,6 +21,9 @@ public class VMachine {
     private String vmName;
 
     @Column
+    private String vmMemLoad;
+
+    @Column
     private String vmUuid;
 
     @Column
