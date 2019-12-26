@@ -386,6 +386,16 @@ public class KvmOperationController {
         return "host";
     }
 
+    @GetMapping("/getMemoryStat")
+    @ResponseBody
+    public Map<String,Object> getMemoryStat(@RequestParam String vm_uuid) throws ServletException, IOException {
+        return KvmUtils.getInstance().getMemoryUsage(vm_uuid);
+    }
+
+    @GetMapping("/memoryStat")
+    public String memoryStat() {
+        return "memoryStat";
+    }
     public enum MyDomainState {
         nostate, running, blocked, paused, shutdown, shutoff, crashed, pmsuspended
     }

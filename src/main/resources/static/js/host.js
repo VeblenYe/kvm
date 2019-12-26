@@ -3,6 +3,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
     const layer = layui.layer;
     const $ = layui.$;
     const tree = layui.tree;
+    var element = layui.element;
 
     $.ajax({
         url: "getTreeData",
@@ -93,7 +94,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
         , cols: [
             [
                 {field: 'vmName', title: 'name'},
-                {field: 'vmUuid', title: 'uuid'},
+                {field: 'vmUuid', title: 'uuid', hide: true},
                 {field: 'vmMemory', title: 'memory(MB)'},
                 {field: 'vmCpus', title: 'cpus'},
                 {field: 'vmState', title: 'state'},
@@ -182,7 +183,27 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                     })
                 }
             })
+        } else if (obj.event === 'memoryStat') {
+
+            layer.open({
+                type: 2,
+                title: 'MemoryStat',
+                area: ['1000px', '900px'],
+                content: 'memoryStat',
+                success: function(req) {
+                    $.ajax({
+                        url: 'getMemoryStat',
+                        async: false,
+                        type: 'get',
+                        data: {'vm_uuid': data['vmUuid']},
+                        success: function(req) {
+                            element.progress('memoryStatBar', req['MemoryPercent'])
+                        }
+                    })
+                }
+            })
         }
+
         $.ajax({
             url: "getTreeData",
             type: "get",
