@@ -28,7 +28,7 @@ public class Host {
     private String hostDescription;
 
     @Column
-    private String ipAddr;
+    private String hostIP;
 
     @Column
     private Long clusterId;

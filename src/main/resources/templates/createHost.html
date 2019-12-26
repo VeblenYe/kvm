@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>CreateVm</title>
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet"/>
+</head>
+<body>
+<form class="layui-form" method="post" id="HostForm" action="do_createHost">
+    <div class="layui-form-item">
+        <label class="layui-form-label">HostName</label>
+        <div class="layui-input-block">
+            <input type="text" name="HostName" lay-verify="title" autocomplete="off" class="layui-input" required>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">Description</label>
+        <div class="layui-input-block">
+            <input type="text" name="HostDescription" lay-verify="title" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">Cluster</label>
+        <div class="layui-input-block">
+            <select id="cluster" name="Cluster" lay-filter="cluster" lay-verify="required">
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">HostMem(MB)</label>
+        <div class="layui-input-block">
+            <input type="text" name="HostMem" lay-verify="title" autocomplete="off" class="layui-input" required>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">HostIP</label>
+        <div class="layui-input-block">
+            <input type="text" name="HostIP" lay-verify="title" autocomplete="off" class="layui-input" required>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">HostStatus</label>
+        <div class="layui-input-block">
+            <input type="text" name="HostStatus" lay-verify="title" autocomplete="off" class="layui-input" required>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">HostCPUs</label>
+        <div class="layui-input-block">
+            <input type="text" name="HostCPUs" lay-verify="title" autocomplete="off" class="layui-input" required>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">HostModel</label>
+        <div class="layui-input-block">
+            <input type="text" name="HostModel" lay-verify="title" autocomplete="off" class="layui-input" required>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">HostType</label>
+        <div class="layui-input-block">
+            <input type="text" name="HostType" lay-verify="title" autocomplete="off" class="layui-input" required>
+        </div>
+    </div>
+    <button style="display: none" id="host-btn" class="btn btn-lg btn-primary btn-block" type="submit"></button>
+</form>
+<script th:src="@{/layui/layui.js}"></script>
+<script th:src="@{/js/createHost.js}"></script>
+</body>
+</html>

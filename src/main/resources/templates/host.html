@@ -11,7 +11,7 @@
         <div class="layui-logo">KVM</div>
         <!-- 头部区域（可配合layui已有的水平导航） -->
         <ul class="layui-nav layui-layout-right">
-            <li class="layui-nav-item"><a href="/logout">退了</a></li>
+            <li class="layui-nav-item"><a href="/logout">logout</a></li>
         </ul>
     </div>
 
@@ -25,8 +25,11 @@
     <div class="layui-body" id="contentMain">
         <!-- 内容主体区域 -->
         </br>
+        <button data-method="createCluster" class="layui-btn">CreateCluster</button>
+        <table class="layui-hide" id="cluster"></table>
         <button data-method="createHost" class="layui-btn">CreateHost</button>
         <table class="layui-hide" id="host"></table>
+        <table class="layui-hide" id="hostUnlink"></table>
         <button data-method="createVm" class="layui-btn">CreateVm</button>
         <table class="layui-hide" id="vm" lay-filter="vm"></table>
     </div>
@@ -41,7 +44,10 @@
     <a class="layui-btn layui-btn-xs" lay-event="start">Start</a>
     <a class="layui-btn layui-btn-xs" lay-event="shutdown">Shutdown</a>
     <a class="layui-btn layui-btn-xs" lay-event="console">Console</a>
-    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">delete</a>
+</script>
+<script type="text/html" id="hostTool">
+    <a class="layui-btn layui-btn-xs" lay-event="link">Link</a>
 </script>
 <script th:src="@{/js/host.js}"></script>
 </body>

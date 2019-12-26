@@ -1,7 +1,6 @@
 package com.example.kvm.Controller;
 
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.example.kvm.Models.Cluster;
 import com.example.kvm.Models.Host;
@@ -18,7 +17,6 @@ import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
 import org.libvirt.NodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.query.PartTreeJpaQuery;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +28,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -81,7 +80,7 @@ public class KvmOperationController {
     public String getVmInfo() {
         Connect conn = null;
         try {
-            conn = new Connect("qemu:///system", false);
+            conn = new Connect(KvmUtils.getConnURI(), false);
         } catch (LibvirtException e) {
             System.out.println("exception caught:" + e);
             System.out.println(e.getError());
@@ -114,7 +113,7 @@ public class KvmOperationController {
         // TODO Auto-generated method stub
         Connect conn = null;
         try {
-            conn = new Connect("qemu:///system", false);
+            conn = new Connect(KvmUtils.getConnURI(), false);
         } catch (LibvirtException e) {
             System.out.println("exception caught:" + e);
             System.out.println(e.getError());
@@ -154,7 +153,7 @@ public class KvmOperationController {
 
     @GetMapping("/getTreeData")
     @ResponseBody
-    public List<TreeDataUtils> getTreeData()     {
+    public List<TreeDataUtils> getTreeData() {
         List<Cluster> clusterList = clusterRepository.findAll();
         List<Host> hostList = hostRepository.findAll();
         List<VMachine> vMachineList = vMachineRepository.findAll();
@@ -162,14 +161,14 @@ public class KvmOperationController {
         List<TreeDataUtils> treeDataUtilsList = new ArrayList<>();
         for (Cluster cluster : clusterList) {
             TreeDataUtils CTreeData = new TreeDataUtils();
-            CTreeData.setTitle("Cluster" + cluster.getClusterId());
+            CTreeData.setTitle(cluster.getClusterName());
             CTreeData.setSpread(true);
             treeDataUtilsList.add(CTreeData);
             for (Host host : hostList) {
                 if (host.getClusterId() == cluster.getClusterId()) {
                     TreeDataUtils HTreeData = new TreeDataUtils();
                     HTreeData.setSpread(true);
-                    HTreeData.setTitle("Host" + host.getHostId());
+                    HTreeData.setTitle(host.getHostName());
                     CTreeData.getChildren().add(HTreeData);
                     for (VMachine vMachine : vMachineList) {
                         if (vMachine.getHostId() == host.getHostId()) {
@@ -234,18 +233,67 @@ public class KvmOperationController {
 
     @GetMapping("/getClusterList")
     @ResponseBody
-    public List<Cluster> getClusterList() {
-        return clusterRepository.findAll();
+    public String getClusterList() {
+        List<Cluster> clusterList = clusterRepository.findAll();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("code", 0);
+        jsonObject.put("msg", "");
+        jsonObject.put("count", clusterList.size());
+        jsonObject.put("data", clusterList);
+        return jsonObject.toString();
     }
 
     @GetMapping("/getHostList")
     @ResponseBody
-    public List<Host> getHostList(@RequestParam String clusterId) {
+    public String getHostList(@RequestParam String clusterId) {
+        List<Host> hostList = null;
         if (clusterId == null || clusterId.isEmpty()) {
-            return hostRepository.findAll();
+            hostList =  hostRepository.findAll();
         } else {
-            return hostRepository.findByClusterId(Long.parseLong(clusterId));
+            hostList =  hostRepository.findByClusterId(Long.parseLong(clusterId));
         }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("code", 0);
+        jsonObject.put("msg", "");
+        jsonObject.put("count", hostList.size());
+        jsonObject.put("data", hostList);
+        return jsonObject.toString();
+    }
+
+    @GetMapping("/createCluster")
+    public String createCluster() {
+        return "createCluster";
+    }
+
+    @PostMapping("/do_createCluster")
+    public String do_createCluster(@RequestParam String clusterName, @RequestParam String clusterDescription) {
+        Cluster cluster = new Cluster();
+        cluster.setClusterName(clusterName);
+        cluster.setClusterDescription(clusterDescription);
+        clusterRepository.save(cluster);
+        return "redirect:/";
+    }
+
+    @GetMapping("/createHost")
+    public String createHost() {
+        return "createHost";
+    }
+
+    @PostMapping("/do_createHost")
+    public String do_createHost(HttpServletRequest request) {
+        Host host = new Host();
+        host.setHostCpus(Integer.parseInt(request.getParameter("HostCPUs")));
+        host.setHostType(request.getParameter("HostType"));
+        host.setHostName(request.getParameter("HostName"));
+        host.setHostMemory(Long.parseLong(request.getParameter("HostMem")));
+        host.setHostModel(request.getParameter("HostModel"));
+        host.setClusterId(Long.parseLong(request.getParameter("Cluster")));
+        host.setHostDescription(request.getParameter("HostDescription"));
+        host.setHostIP(request.getParameter("HostIP"));
+        host.setHostStatus(request.getParameter("HostStatus"));
+
+        hostRepository.save(host);
+        return "redirect:/";
     }
 
     @GetMapping("/createVm")
@@ -315,7 +363,7 @@ public class KvmOperationController {
         String vmUuid = vm_uuid;
         KvmUtils.getInstance().setVncProxyFile(vmUuid);
         System.out.println("url=" + request.getRequestURL());
-        java.net.URL url = new java.net.URL(request.getRequestURL().toString());
+        URL url = new java.net.URL(request.getRequestURL().toString());
         System.out.println("url-host=" + url.getHost());
         return "http://" + url.getHost() + ":6080" + "/vnc_lite.html?token=" + vmUuid;
     }

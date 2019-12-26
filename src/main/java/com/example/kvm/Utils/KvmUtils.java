@@ -71,10 +71,12 @@ public class KvmUtils {
             "</volume>";
     private Connect conn = null;
 
+    private static String connURI = "qemu:///system";
+
     private KvmUtils() {
         System.out.println("------------->KvmDemoUtils");
         try {
-            conn = new Connect("qemu:///system", false);
+            conn = new Connect(connURI, false);
         } catch (LibvirtException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -84,6 +86,14 @@ public class KvmUtils {
 
     public static KvmUtils getInstance() {
         return instance;
+    }
+
+    public static String getConnURI() {
+        return connURI;
+    }
+
+    public static void setConnURI(String newConnURI) {
+        connURI = newConnURI;
     }
 
     public int startVm(String vmUuid) {

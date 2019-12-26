@@ -44,7 +44,7 @@ layui.use(['form'], function () {
                 memory = memory * 2;
                 ++id;
             } while (memory < maxMem);
-
+            $('#vmMemory').append(new Option(String(maxMem), String(maxMem)));
             const maxCPUs = parseInt(obj['data'][0]['hostCpus']);
             var cpu = 1;
             id = 0;
@@ -62,22 +62,22 @@ layui.use(['form'], function () {
         type: 'get',
         async: false,
         success: function (data) {
-            //console.log(data);
-            $.each(data, function (index, item) {
-                //console.log(item);
-                $('#cluster').append(new Option(item['clusterId'], item.id));// 下拉菜单里添加元素
+            //console.log(d['data']);
+            const firstId = JSON.parse(data)['data'][0]['clusterId'];
+            $.each(JSON.parse(data)['data'], function (index, item) {
+                //console.log(item['clusterId']);
+                $('#cluster').append(new Option(item['clusterName'], item['clusterId']));// 下拉菜单里添加元素
             });
             $.ajax({
                 url: 'getHostList',
                 type: 'get',
-                data: {'clusterId': "1"},
+                data: {'clusterId': firstId},
                 async: false,
                 success: function (data) {
-                    //console.log(data);
                     $('#host').empty();
-                    $.each(data, function (index, item) {
+                    $.each(JSON.parse(data)['data'], function (index, item) {
                         //console.log(item);
-                        $('#host').append(new Option(item['hostId'], item.id));// 下拉菜单里添加元素
+                        $('#host').append(new Option(item['hostName'], item['hostId']));// 下拉菜单里添加元素
                     });
                     layui.form.render("select");
                 }
@@ -88,7 +88,7 @@ layui.use(['form'], function () {
 
     form.on('select(cluster)', function(data) {
         //event.preventDefault();
-        console.log(data.value);
+        //console.log(data.value);
         $.ajax({
             url: 'getHostList',
             type: 'get',
@@ -97,9 +97,9 @@ layui.use(['form'], function () {
             success: function (data) {
                 //console.log(data);
                 $('#host').empty();
-                $.each(data, function (index, item) {
+                $.each(JSON.parse(data)['data'], function (index, item) {
                     //console.log(item);
-                    $('#host').append(new Option(item['hostId'], item.id));// 下拉菜单里添加元素
+                    $('#host').append(new Option(item['hostName'], item['hostId']));// 下拉菜单里添加元素
                 });
                 layui.form.render("select");
             }

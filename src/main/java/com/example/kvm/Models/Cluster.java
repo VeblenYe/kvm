@@ -18,5 +18,8 @@ public class Cluster {
     private Long clusterId;
 
     @Column
+    private String clusterName;
+
+    @Column
     private String clusterDescription;
 }

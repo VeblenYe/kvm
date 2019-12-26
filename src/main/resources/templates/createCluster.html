@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>CreateCluster</title>
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet"/>
+</head>
+<body>
+<form class="layui-form" method="post" id="ClusterForm" action="do_createCluster">
+    <div class="layui-form-item">
+        <label class="layui-form-label">ClusterName</label>
+        <div class="layui-input-block">
+            <input type="text" name="clusterName" lay-verify="title" autocomplete="off" class="layui-input" required>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">Description</label>
+        <div class="layui-input-block">
+            <input type="text" name="clusterDescription" lay-verify="title" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <button style="display: none" id="btn" class="btn btn-lg btn-primary btn-block" type="submit"></button>
+</form>
+<script th:src="@{/layui/layui.js}"></script>
+</body>
+</html>
