@@ -93,11 +93,13 @@ public class KvmUtils {
     }
 
     public static void setConnURI(String newConnURI) {
-        try {
-            conn.close();
-        } catch (LibvirtException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (LibvirtException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         connURI = newConnURI;
         try {

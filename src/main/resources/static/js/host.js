@@ -186,10 +186,21 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
             console.log(data['hostIP']);
             $.ajax({
                 url: 'link',
-                aysnc: false,
+                async: false,
                 data: {'hostIP': data['hostIP']},
                 success: function (req) {
-
+                    table.reload('hostReload', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                        , where: {}
+                    }, 'data');
+                    table.reload('vmReload', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                        , where: {}
+                    }, 'data');
                 }
             })
         }
