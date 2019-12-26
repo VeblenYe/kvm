@@ -9,4 +9,6 @@ public interface HostRepository extends JpaRepository<Host, Integer> {
 
     List<Host> findByClusterId(Long cluster_id);
 
+    Host findByHostId(Long host_id);
+
 }

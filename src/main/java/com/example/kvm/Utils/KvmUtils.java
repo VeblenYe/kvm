@@ -9,7 +9,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,28 +69,19 @@ public class KvmUtils {
             "        </permissions>\n" +
             "    </target>\n" +
             "</volume>";
+    private static Connect conn = null;
 
     private static String connURI = "qemu:///system";
 
-    private static Connect conn;
-
-    static {
+    private KvmUtils() {
+        System.out.println("------------->KvmDemoUtils");
         try {
             conn = new Connect(connURI, false);
         } catch (LibvirtException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
+            throw new RuntimeException();
         }
-    }
-
-    private KvmUtils() {
-        System.out.println("------------->KvmDemoUtils");
-//        try {
-//            conn = new Connect(connURI, false);
-//        } catch (LibvirtException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//            throw new RuntimeException();
-//        }
     }
 
     public static KvmUtils getInstance() {
@@ -145,7 +135,6 @@ public class KvmUtils {
     }
 
     public int deleteVm(String vmUuid, boolean deleteDisk) {
-
         Domain dom;
         try {
             dom = conn.domainLookupByUUIDString(vmUuid);
@@ -299,24 +288,4 @@ public class KvmUtils {
         }
         return null;
     }
-
-
-    public Map<String, Object> getMemoryUsage(String uuid) {
-        Domain domain;
-        Map<String, Object> memoryMap = new HashMap<>();
-        try {
-            System.out.println(uuid);
-            domain = conn.domainLookupByUUIDString(uuid);
-            MemoryStatistic[] statistics= domain.memoryStats(2);
-            DecimalFormat decimalFormat = new DecimalFormat("0.0");
-            double percent = (double)statistics[1].getValue() / statistics[0].getValue()* 100;
-            memoryMap.put("MemoryPercent", decimalFormat.format(percent) + "%");
-            return memoryMap;
-        } catch (LibvirtException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
 }
