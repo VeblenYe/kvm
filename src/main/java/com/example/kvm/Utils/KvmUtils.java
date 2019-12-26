@@ -9,6 +9,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -284,6 +285,23 @@ public class KvmUtils {
             return vol.getPath();
         } catch (LibvirtException e) {
             // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Map<String, Object> getMemoryStat(String uuid) {
+        Domain domain;
+        Map<String, Object> map = new HashMap<>();
+        try {
+            domain = conn.domainLookupByUUIDString(uuid);
+            MemoryStatistic[] statistics = domain.memoryStats(2);
+            DecimalFormat decimalFormat = new DecimalFormat("0");
+            double memoryPercent = (double)statistics[1].getValue() / statistics[0].getValue() * 100;
+            String percent = decimalFormat.format(memoryPercent) + "%";
+            map.put("MemoryPercent", percent);
+            return map;
+        } catch (LibvirtException e) {
             e.printStackTrace();
         }
         return null;
