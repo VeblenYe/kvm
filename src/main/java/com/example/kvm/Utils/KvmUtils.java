@@ -1,5 +1,6 @@
 package com.example.kvm.Utils;
 
+import com.example.kvm.Controller.KvmOperationController;
 import org.libvirt.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -296,10 +297,15 @@ public class KvmUtils {
         Domain domain;
         try {
             domain = conn.domainLookupByUUIDString(uuid);
-            MemoryStatistic[] statistics = domain.memoryStats(2);
-            DecimalFormat decimalFormat = new DecimalFormat("0");
-            double memoryPercent = (double)statistics[1].getValue() / statistics[0].getValue() * 100;
-            return decimalFormat.format(memoryPercent) + "%";
+            String state = KvmOperationController.MyDomainState.values()[domain.getInfo().state.ordinal()].toString();
+            if (state.equalsIgnoreCase("running")) {
+                MemoryStatistic[] statistics = domain.memoryStats(2);
+                DecimalFormat decimalFormat = new DecimalFormat("0");
+                double memoryPercent = (double) statistics[1].getValue() / statistics[0].getValue() * 100;
+                return decimalFormat.format(memoryPercent) + "%";
+            } else {
+                return "0%";
+            }
         } catch (LibvirtException e) {
             e.printStackTrace();
         }
