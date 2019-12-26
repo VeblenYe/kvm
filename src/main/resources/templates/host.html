@@ -25,13 +25,21 @@
     <div class="layui-body" id="contentMain">
         <!-- 内容主体区域 -->
         </br>
+        <h1 style="position: center">Cluster List</h1>
         <button data-method="createCluster" class="layui-btn">CreateCluster</button>
         <table class="layui-hide" id="cluster"></table>
-        <button data-method="createHost" class="layui-btn">CreateHost</button>
+        <h1 style="position: center">Link Host</h1>
         <table class="layui-hide" id="host"></table>
-        <table class="layui-hide" id="hostUnlink" lay-filter="hostUnlink"></table>
-        <button data-method="createVm" class="layui-btn">CreateVm</button>
+        <h1 style="position: center">Link VM</h1>
         <table class="layui-hide" id="vm" lay-filter="vm"></table>
+
+        <h1 style="position: center">Host List</h1>
+        <button data-method="createHost" class="layui-btn">CreateHost</button>
+        <table class="layui-hide" id="hostUnlink" lay-filter="hostUnlink"></table>
+        <h1 style="position: center">VM List</h1>
+        <button data-method="createVm" class="layui-btn">CreateVm</button>
+        <table class="layui-hide" id="vmUnlink" lay-filter="vmUnlink"></table>
+
     </div>
 
     <div class="layui-footer">

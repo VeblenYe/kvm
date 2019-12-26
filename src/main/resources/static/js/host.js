@@ -73,6 +73,21 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
     });
 
     table.render({
+        elem: '#vmUnlink'
+        , id: 'vmUnlinkReload'
+        , url: 'getVMList'
+        , cols: [
+            [
+                {field: 'vmName', title: 'vmName'},
+                {field: 'vmUuid', title: 'uuid'},
+                {field: 'vmMemory', title: 'memory(MB)'},
+                {field: 'vmCpus', title: 'cpus'},
+                {field: 'vmState', title: 'state'}
+            ]
+        ]
+    });
+
+    table.render({
         elem: '#vm'
         , url: 'getVmInfo'
         , cols: [

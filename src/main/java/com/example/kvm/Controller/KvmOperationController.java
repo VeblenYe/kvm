@@ -260,6 +260,18 @@ public class KvmOperationController {
         return jsonObject.toString();
     }
 
+    @GetMapping("/getVMList")
+    @ResponseBody
+    public String getVMList() {
+        List<VMachine> vMachineList = vMachineRepository.findAll();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("code", 0);
+        jsonObject.put("msg", "");
+        jsonObject.put("count", vMachineList.size());
+        jsonObject.put("data", vMachineList);
+        return jsonObject.toString();
+    }
+
     @GetMapping("/createCluster")
     public String createCluster() {
         return "createCluster";
