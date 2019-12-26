@@ -54,7 +54,7 @@ public class KvmOperationController {
         vMachine.setVmUuid(d.getUUIDString());
         vMachine.setVmName(d.getName());
         vMachine.setVmCpus(d.getInfo().nrVirtCpu);
-        vMachine.setVmMemory(d.getMaxMemory());
+        vMachine.setVmMemory(d.getMaxMemory() >> 10);
         vMachine.setVmMemLoad(KvmUtils.getInstance().getMemoryStat(d.getUUIDString()));
         vMachine.setVmState(MyDomainState.values()[d.getInfo().state.ordinal()].toString());
         return vMachine;
@@ -322,7 +322,11 @@ public class KvmOperationController {
         long mem = Long.parseLong(request.getParameter("VmMemory"));
         long volSize = Long.parseLong(request.getParameter("VmDisk"));
         String sp = request.getParameter("VmAddr");
+
+        String oldURI = KvmUtils.getConnURI();
+        KvmUtils.setConnURI(hostRepository.findByHostId(Long.parseLong(request.getParameter("Host"))).getHostIP());
         String uuid = KvmUtils.getInstance().createVm(vmName, cpus, mem, volSize, isopath, sp);
+        KvmUtils.setConnURI(oldURI);
 
         VMachine vMachine = new VMachine();
         vMachine.setVmState("shutoff");
