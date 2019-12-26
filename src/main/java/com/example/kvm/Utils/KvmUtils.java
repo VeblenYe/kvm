@@ -69,19 +69,21 @@ public class KvmUtils {
             "        </permissions>\n" +
             "    </target>\n" +
             "</volume>";
-    private static Connect conn = null;
 
     private static String connURI = "qemu:///system";
 
-    private KvmUtils() {
-        System.out.println("------------->KvmDemoUtils");
+    private static Connect conn;
+
+    static {
         try {
             conn = new Connect(connURI, false);
         } catch (LibvirtException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
-            throw new RuntimeException();
         }
+    }
+
+    private KvmUtils() {
+        System.out.println("------------->KvmDemoUtils");
     }
 
     public static KvmUtils getInstance() {
