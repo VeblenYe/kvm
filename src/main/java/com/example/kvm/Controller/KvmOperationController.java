@@ -405,7 +405,7 @@ public class KvmOperationController {
     public String vmConsole(@RequestParam String vm_uuid) {
         Host host = hostRepository.findByHostId(vMachineRepository.findByVmUuid(vm_uuid).getHostId());
         KvmUtils.getInstance().setVncProxyFile(vm_uuid);
-        return "http://" + host.getVncIP() + ":6080" + "/vnc_lite.html?token=" + vm_uuid;
+        return "http://" + host.getHostIP() + ":6080" + "/vnc_lite.html?token=" + vm_uuid;
     }
 
     @GetMapping("/link")

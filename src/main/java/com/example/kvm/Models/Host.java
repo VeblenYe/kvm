@@ -31,9 +31,6 @@ public class Host {
     private String hostIP;
 
     @Column
-    private String vncIP;
-
-    @Column
     private Long clusterId;
 
     @Column
