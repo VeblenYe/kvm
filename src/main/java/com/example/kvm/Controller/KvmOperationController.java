@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.persistence.Id;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -128,7 +129,9 @@ public class KvmOperationController {
             host.setHostName(conn.getHostName());
             host.setHostType(conn.getType());
             host.setHostCpus(nodeInfo.cpus);
-            host.setHostMemLoad(KvmUtils.getInstance().getHostMemoryUsage(conn.getHostName()));
+            Host host1 = hostRepository.findByHostName(conn.getHostName());
+            List<VMachine> vMachineList = vMachineRepository.findByHostId(host1.getHostId());
+            host.setHostMemLoad(KvmUtils.getInstance().getHostMemoryUsage(host1.getHostMemory(), vMachineList));
             List<Host> allHosts = new ArrayList<>();
             allHosts.add(host);
 

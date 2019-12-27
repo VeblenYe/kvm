@@ -322,38 +322,8 @@ public class KvmUtils {
         return null;
     }
 
-    public String getHostMemoryUsage(String hostname) throws IOException, LibvirtException {
-//        File file = new File("/proc/meminfo");
-//        BufferedReader br = new BufferedReader(new InputStreamReader(
-//                new FileInputStream(file)));
-//        int[] result = new int[4];
-//        String str = null;
-//        StringTokenizer token = null;
-//        while ((str = br.readLine()) != null) {
-//            token = new StringTokenizer(str);
-//            if (!token.hasMoreTokens())
-//                continue;
-//
-//            str = token.nextToken();
-//            if (!token.hasMoreTokens())
-//                continue;
-//
-//            if (str.equalsIgnoreCase("MemTotal:"))
-//                result[0] = Integer.parseInt(token.nextToken());
-//            else if (str.equalsIgnoreCase("MemFree:"))
-//                result[1] = Integer.parseInt(token.nextToken());
-//            else if (str.equalsIgnoreCase("SwapTotal:"))
-//                result[2] = Integer.parseInt(token.nextToken());
-//            else if (str.equalsIgnoreCase("SwapFree:"))
-//                result[3] = Integer.parseInt(token.nextToken());
-//        }
-//
-//        double MemoryUsagePercent = (result[0] - result[1]) / (double) result[0] * 100;
-//        return  String.valueOf(MemoryUsagePercent) + "%";
+    public String getHostMemoryUsage(Long hostMemory, List<VMachine> vMachineList) throws IOException, LibvirtException {
         Domain domain;
-        Host host = hostRepository.findByHostName(hostname);
-        List<VMachine> vMachineList = vMachineRepository.findByHostId(host.getHostId());
-        double totalMemory = 0;
         double usageMemory = 0;
         for (VMachine vMachine : vMachineList) {
             domain = conn.domainLookupByUUIDString(vMachine.getVmUuid());
@@ -361,13 +331,10 @@ public class KvmUtils {
             if (state.equalsIgnoreCase("running")) {
                 MemoryStatistic[] memoryStatistics = domain.memoryStats(2);
                 usageMemory += (double)memoryStatistics[1].getValue();
-                totalMemory +=(double)memoryStatistics[0].getValue();
-            }
-            else {
-                totalMemory += (double)domain.getMaxMemory();
             }
         }
+        DecimalFormat decimalFormat = new DecimalFormat("0");
 
-        return String.valueOf(usageMemory / totalMemory * 100) + "%";
+        return decimalFormat.format((usageMemory / 1024 ) / Double.valueOf(hostMemory) * 100) + "%";
     }
 }
