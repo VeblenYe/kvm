@@ -128,6 +128,7 @@ public class KvmOperationController {
             host.setHostName(conn.getHostName());
             host.setHostType(conn.getType());
             host.setHostCpus(nodeInfo.cpus);
+            host.setHostMemLoad(KvmUtils.getInstance().getHostMemoryUsage(conn.getHostName()));
             List<Host> allHosts = new ArrayList<>();
             allHosts.add(host);
 
@@ -137,7 +138,7 @@ public class KvmOperationController {
             jsonObject.put("count", 1);
             jsonObject.put("data", allHosts);
             return jsonObject.toString();
-        } catch (LibvirtException e) {
+        } catch (LibvirtException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {

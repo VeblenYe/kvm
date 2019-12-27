@@ -47,4 +47,7 @@ public class Host {
 
     @Column
     private String hostType;
+
+    @Column
+    private String hostMemLoad;
 }

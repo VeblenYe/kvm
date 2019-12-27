@@ -11,4 +11,5 @@ public interface HostRepository extends JpaRepository<Host, Integer> {
 
     Host findByHostId(Long host_id);
 
+    Host findByHostName(String host_name);
 }

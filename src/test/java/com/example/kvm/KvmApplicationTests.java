@@ -9,5 +9,4 @@ class KvmApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }

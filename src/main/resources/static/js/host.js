@@ -49,6 +49,15 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                 {field: 'hostName', title: 'hostname'},
                 {field: 'hostModel', title: 'model'},
                 {field: 'hostMemory', title: 'memory(MB)'},
+
+                {
+                    field: 'hostMemLoad', title: 'memLoad(MB)', templet: function (data) {
+                        return '<div class="layui-progress layui-progress-big" lay-showpercent="true" lay-filter="demo">' +
+                            '<div class="layui-progress-bar layui-bg-green" lay-percent="' +
+                            data.hostMemLoad + '"></div></div>'
+                    }
+                },
+
                 {field: 'hostCpus', title: 'cpus'},
                 {field: 'hostType', title: 'type'}
             ]
@@ -90,6 +99,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
         ]
     });
 
+
     table.render({
         elem: '#vm'
         , url: 'getVmInfo'
@@ -100,7 +110,8 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                 {field: 'vmMemory', title: 'memory(MB)'},
                 {
                     field: 'vmMemLoad', title: 'memLoad(MB)', templet: function (data) {
-                        return '<div class="layui-progress layui-progress-big" lay-showpercent="true">' +
+                        element.progress('demo', data.vmMemLoad);
+                        return '<div class="layui-progress layui-progress-big" lay-showpercent="true" lay-filter="demo">' +
                             '<div class="layui-progress-bar layui-bg-green" lay-percent="' +
                             data['vmMemLoad'] + '"></div></div>'
                     }
@@ -112,6 +123,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
         ]
         , id: "vmReload"
         , done: function (res, currentCount) {
+            console.log("hello");
             element.render();
         }
     });

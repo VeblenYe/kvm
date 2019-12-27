@@ -1,7 +1,12 @@
 package com.example.kvm.Utils;
 
 import com.example.kvm.Controller.KvmOperationController;
+import com.example.kvm.Models.Host;
+import com.example.kvm.Models.VMachine;
+import com.example.kvm.Repository.HostRepository;
+import com.example.kvm.Repository.VMachineRepository;
 import org.libvirt.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -11,12 +16,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class KvmUtils {
+    @Autowired
+    private VMachineRepository vMachineRepository;
+    @Autowired
+    private HostRepository hostRepository;
     private static KvmUtils instance = new KvmUtils();
     private static String xmldesc = "<domain type=\"kvm\">\n" +
             "    <name>%s</name>  <!--虚拟机名称-->\n" +
@@ -314,5 +320,54 @@ public class KvmUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String getHostMemoryUsage(String hostname) throws IOException, LibvirtException {
+//        File file = new File("/proc/meminfo");
+//        BufferedReader br = new BufferedReader(new InputStreamReader(
+//                new FileInputStream(file)));
+//        int[] result = new int[4];
+//        String str = null;
+//        StringTokenizer token = null;
+//        while ((str = br.readLine()) != null) {
+//            token = new StringTokenizer(str);
+//            if (!token.hasMoreTokens())
+//                continue;
+//
+//            str = token.nextToken();
+//            if (!token.hasMoreTokens())
+//                continue;
+//
+//            if (str.equalsIgnoreCase("MemTotal:"))
+//                result[0] = Integer.parseInt(token.nextToken());
+//            else if (str.equalsIgnoreCase("MemFree:"))
+//                result[1] = Integer.parseInt(token.nextToken());
+//            else if (str.equalsIgnoreCase("SwapTotal:"))
+//                result[2] = Integer.parseInt(token.nextToken());
+//            else if (str.equalsIgnoreCase("SwapFree:"))
+//                result[3] = Integer.parseInt(token.nextToken());
+//        }
+//
+//        double MemoryUsagePercent = (result[0] - result[1]) / (double) result[0] * 100;
+//        return  String.valueOf(MemoryUsagePercent) + "%";
+        Domain domain;
+        Host host = hostRepository.findByHostName(hostname);
+        List<VMachine> vMachineList = vMachineRepository.findByHostId(host.getHostId());
+        double totalMemory = 0;
+        double usageMemory = 0;
+        for (VMachine vMachine : vMachineList) {
+            domain = conn.domainLookupByUUIDString(vMachine.getVmUuid());
+            String state = KvmOperationController.MyDomainState.values()[domain.getInfo().state.ordinal()].toString();
+            if (state.equalsIgnoreCase("running")) {
+                MemoryStatistic[] memoryStatistics = domain.memoryStats(2);
+                usageMemory += (double)memoryStatistics[1].getValue();
+                totalMemory +=(double)memoryStatistics[0].getValue();
+            }
+            else {
+                totalMemory += (double)domain.getMaxMemory();
+            }
+        }
+
+        return String.valueOf(usageMemory / totalMemory * 100) + "%";
     }
 }
