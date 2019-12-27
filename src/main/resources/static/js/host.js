@@ -34,7 +34,8 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
         , cols: [
             [
                 {field: 'clusterName', title: 'clusterName'},
-                {field: 'clusterDescription', title: 'clusterDescription'}
+                {field: 'clusterDescription', title: 'clusterDescription'},
+                {fixed: 'right', title: 'operation', align: 'center', toolbar: '#clusterTool'}
             ]
         ]
     });
@@ -68,6 +69,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                 {field: 'hostMemory', title: 'memory(MB)'},
                 {field: 'hostCpus', title: 'cpus'},
                 {field: 'hostType', title: 'type'},
+                {field: 'hostIP', title: 'IP'},
                 {fixed: 'right', title: 'operation', align: 'center', toolbar: '#hostTool'}
             ]
         ]
@@ -114,6 +116,45 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
         }
     });
 
+    table.on('tool(cluster)', function (obj) {
+        const data = obj.data;
+        console.log(data);
+        if (obj.event === "del") {
+            layer.confirm('confirm to delete Cluster?', function (index) {
+                $.ajax({
+                    url: 'deleteCluster',
+                    async: false,
+                    type: "get",
+                    data: {'cluster_id': data['clusterId']},
+                    success: function (req) {
+                        //执行重载
+                        if (req === "failed") {
+                            layer.msg("The cluster still contains hosts or virtual machines");
+                        }
+                        table.reload('clusterReload', {
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            }
+                            , where: {}
+                        }, 'data');
+                        $.ajax({
+                            url: "getTreeData",
+                            type: "get",
+                            async: false,
+                            success: function (req) {
+                                tree.reload('treeId', {
+                                    data: req
+                                });
+                            }
+                        })
+                    }
+                });
+                obj.del();
+                layer.close(index);
+            });
+        }
+    });
+
     table.on('tool(vm)', function (obj) {
         const data = obj.data;
         if (obj.event === 'start') {
@@ -141,7 +182,16 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                     data: {'vm_uuid': data['vmUuid']},
                     success: function (req) {
                         //执行重载
+                        if (req === "failed") {
+                            layer.msg("Please shutoff the VM first");
+                        }
                         table.reload('vmReload', {
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            }
+                            , where: {}
+                        }, 'data');
+                        table.reload('vmUnlinkReload', {
                             page: {
                                 curr: 1 //重新从第 1 页开始
                             }
@@ -194,7 +244,12 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                 }
             })
         }
-
+        table.reload('vmUnlinkReload', {
+            page: {
+                curr: 1 //重新从第 1 页开始
+            }
+            , where: {}
+        }, 'data');
         $.ajax({
             url: "getTreeData",
             type: "get",
@@ -209,6 +264,7 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
 
     table.on('tool(hostUnlink)', function (obj) {
         const data = obj.data;
+        //console.log(data);
         if (obj.event === 'link') {
             console.log(data['hostIP']);
             $.ajax({
@@ -230,6 +286,40 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                     }, 'data');
                 }
             })
+        }
+        else if (obj.event === 'del') {
+            layer.confirm('confirm to delete Host?', function (index) {
+                $.ajax({
+                    url: 'deleteHost',
+                    async: false,
+                    type: "get",
+                    data: {'host_id': data['hostId']},
+                    success: function (req) {
+                        //执行重载
+                        if (req === "failed") {
+                            layer.msg("The host still contains virtual machines");
+                        }
+                        table.reload('hostUnlinkReload', {
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            }
+                            , where: {}
+                        }, 'data');
+                        $.ajax({
+                            url: "getTreeData",
+                            type: "get",
+                            async: false,
+                            success: function (req) {
+                                tree.reload('treeId', {
+                                    data: req
+                                });
+                            }
+                        })
+                    }
+                });
+                obj.del();
+                layer.close(index);
+            });
         }
     });
 
@@ -256,6 +346,12 @@ layui.use(['element', 'table', 'layer', 'form', 'tree'], function () {
                             shade: 0.5,
                             end: function () {
                                 table.reload('vmReload', {
+                                    page: {
+                                        curr: 1 //重新从第 1 页开始
+                                    }
+                                    , where: {}
+                                }, 'data');
+                                table.reload('vmUnlinkReload', {
                                     page: {
                                         curr: 1 //重新从第 1 页开始
                                     }

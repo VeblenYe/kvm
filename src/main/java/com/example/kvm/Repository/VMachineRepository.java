@@ -9,4 +9,6 @@ public interface VMachineRepository extends JpaRepository<VMachine, Integer> {
     List<VMachine> findByHostId(Long host_id);
 
     VMachine findByVmUuid(String vmUuid);
+
+    List<VMachine> findByClusterId(Long cluster_id);
 }

@@ -105,7 +105,11 @@ public class KvmUtils {
                 e.printStackTrace();
             }
         }
-        connURI = newConnURI;
+        if (newConnURI.startsWith("qemu")) {
+            connURI = newConnURI;
+        } else {
+            connURI = "qemu+tcp://" + newConnURI + "/system";
+        }
         try {
             conn = new Connect(connURI, false);
         } catch (LibvirtException e) {

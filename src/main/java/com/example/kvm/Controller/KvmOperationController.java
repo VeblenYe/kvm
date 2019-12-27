@@ -354,6 +354,32 @@ public class KvmOperationController {
         }
     }
 
+    @GetMapping("/deleteCluster")
+    @ResponseBody
+    public String deleteCluster(@RequestParam String cluster_id) {
+        List<Host> hostList = hostRepository.findByClusterId(Long.parseLong(cluster_id));
+        if (!hostList.isEmpty()) {
+            return "failed";
+        }
+        List<VMachine> vMachineList = vMachineRepository.findByClusterId(Long.parseLong(cluster_id));
+        if (!vMachineList.isEmpty()) {
+            return "failed";
+        }
+        clusterRepository.delete(clusterRepository.findByClusterId(Long.parseLong(cluster_id)));
+        return "success";
+    }
+
+    @GetMapping("/deleteHost")
+    @ResponseBody
+    public String deleteHost(@RequestParam String host_id) {
+        List<VMachine> vMachineList = vMachineRepository.findByHostId(Long.parseLong(host_id));
+        if (!vMachineList.isEmpty()) {
+            return "failed";
+        }
+        hostRepository.delete(hostRepository.findByHostId(Long.parseLong(host_id)));
+        return "success";
+    }
+
     @GetMapping("/startVm")
     @ResponseBody
     public String startVm(@RequestParam String vm_uuid) {

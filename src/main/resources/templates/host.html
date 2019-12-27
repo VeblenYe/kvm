@@ -27,7 +27,7 @@
         </br>
         <h1 style="position: center">Cluster List</h1>
         <button data-method="createCluster" class="layui-btn">CreateCluster</button>
-        <table class="layui-hide" id="cluster"></table>
+        <table class="layui-hide" id="cluster" lay-filter="cluster"></table>
         <h1 style="position: center">Link Host</h1>
         <table class="layui-hide" id="host"></table>
         <h1 style="position: center">Link VM</h1>
@@ -48,6 +48,9 @@
     </div>
 </div>
 <script th:src="@{/layui/layui.js}"></script>
+<script type="text/html" id="clusterTool">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">delete</a>
+</script>
 <script type="text/html" id="vmTool">
     <a class="layui-btn layui-btn-xs" lay-event="start">Start</a>
     <a class="layui-btn layui-btn-xs" lay-event="shutdown">Shutdown</a>
@@ -56,6 +59,7 @@
 </script>
 <script type="text/html" id="hostTool">
     <a class="layui-btn layui-btn-xs" lay-event="link">Link</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">delete</a>
 </script>
 <script th:src="@{/js/host.js}"></script>
 </body>

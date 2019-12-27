@@ -14,7 +14,7 @@ public class TreeDataUtils {
     private String field;
     private List<TreeDataUtils> children = new ArrayList<>();
     private String href;
-    private boolean spread = false;
+    private boolean spread = true;
     private boolean checked = false;
     private boolean disable = false;
 }
